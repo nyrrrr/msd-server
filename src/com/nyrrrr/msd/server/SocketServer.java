@@ -19,27 +19,22 @@ public class SocketServer {
 
 	public static void main(String args[]) {
 		iPortNumber = Integer.parseInt(args[0]);
-		System.out.println("Try to start server on port: " + iPortNumber);
 
-		try (ServerSocket serverSocket = new ServerSocket(iPortNumber);
-				Socket clientSocket = serverSocket.accept();
-				// only listens to one client at a time
-				PrintWriter printWriter = new PrintWriter(clientSocket.getOutputStream(), true);
+		try {
+			ServerSocket serverSocket = new ServerSocket(iPortNumber);
+			System.out.println("Server started and listening on port: " + iPortNumber);
+
+			while (true) { // always running
+				Socket socket = serverSocket.accept();
 				BufferedReader bufferedReader = new BufferedReader(
-						new InputStreamReader(clientSocket.getInputStream()));) {
+						new InputStreamReader(socket.getInputStream()));
 
-			System.out.println("Connection established");
-			String input;
-			
-			// TODO set up protocoll
-			
-			// TODO handle input
-			while ((input = bufferedReader.readLine()) != null) {
+				System.out.println("Received a message from client: " + bufferedReader.readLine());
 				
-				
-				if(true) break; // TODO end condition
+				PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
+				writer.println("TEST");
+				writer.flush();
 			}
-			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
