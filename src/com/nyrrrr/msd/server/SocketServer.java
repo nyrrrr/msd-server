@@ -12,7 +12,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
- * Server used for receiving motion sensor datalogs from victim
+ * Server used for receiving motion sensor datalogs from victim app
  * 
  * @author nyrrrr
  *
@@ -28,7 +28,7 @@ public class SocketServer {
 	private static FileOutputStream fileOutPutStream;
 	private static InputStream inputStream;
 
-//	private static String outputFileDestination = "C:\\git\\data-thesis\\";
+	// private static String outputFileDestination = "C:\\git\\data-thesis\\";
 	private static String outputFileDestination = "C:\\Users\\nyrrrr\\Desktop\\";
 
 	public static void main(String args[]) {
@@ -60,7 +60,7 @@ public class SocketServer {
 						bufferSize = Integer.parseInt(reader.readLine());
 						writer.println("Waiting for file...");
 						writer.flush();
-						receiveFile(outputFileDestination, fileName , bufferSize);
+						receiveFile(outputFileDestination, fileName, bufferSize);
 					} else {
 						writer.println("400");
 						writer.flush();
@@ -71,14 +71,11 @@ public class SocketServer {
 				}
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 
 	/**
-	 * TODO refactor
 	 * 
 	 * @param outputFileDestination
 	 * @param fileName
@@ -90,20 +87,21 @@ public class SocketServer {
 			throws IOException, FileNotFoundException {
 		int bytesRead;
 		int offset = 0;
-		byte[] byteArray = new byte[bufferSize];
+		char[] charArray = new char[bufferSize];
 
-		inputStream = socket.getInputStream();
 		fileOutPutStream = new FileOutputStream(outputFileDestination + fileName);
 		bufferedOutputStream = new BufferedOutputStream(fileOutPutStream);
 
-		while ((bytesRead = inputStream.read(byteArray, offset, bufferSize - offset)) > 0) {
+		while ((bytesRead = reader.read(charArray, offset, bufferSize - offset)) > 0) {
 			offset += bytesRead;
 
 		}
-
-		bufferedOutputStream.write(byteArray, 0, offset);
-		bufferedOutputStream.flush();
-		System.out.println("Stored");
+		PrintWriter fileWriter = new PrintWriter(fileOutPutStream);
+		fileWriter.write(charArray, 0, offset);
+		fileWriter.flush();
+		System.out.println("File successfully stored");
+		writer.println("File successfully stored");
+		writer.flush();
 	}
 
 }
