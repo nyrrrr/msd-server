@@ -2,6 +2,7 @@ package com.nyrrrr.msd.server;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,11 +22,14 @@ public class SocketServer {
 	private static int iPortNumber;
 	private static Socket socket;
 
+	private static BufferedReader reader;
+	private static PrintWriter writer;
 	private static BufferedOutputStream bufferedOutputStream;
 	private static FileOutputStream fileOutPutStream;
 	private static InputStream inputStream;
 
-	private static int bufferSize = 2000000000;
+//	private static String outputFileDestination = "C:\\git\\data-thesis\\";
+	private static String outputFileDestination = "C:\\Users\\nyrrrr\\Desktop\\";
 
 	public static void main(String args[]) {
 		iPortNumber = Integer.parseInt(args[0]);
@@ -34,33 +38,72 @@ public class SocketServer {
 			ServerSocket serverSocket = new ServerSocket(iPortNumber);
 			System.out.println("Server started and listening on port: " + iPortNumber);
 
-			String outputFileDestination = "C:\\Users\\nyrrrr\\Desktop\\test.csv";
+			int bufferSize = 16384;
+			String fileName = "";
+			String message = "";
 
 			while (true) { // always running
 				socket = serverSocket.accept();
 
-				byte[] byteArray = new byte[bufferSize];
-				int offset = 0;
-				int bytesRead;
+				reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				writer = new PrintWriter(socket.getOutputStream(), true);
+				message = reader.readLine();
 
-				inputStream = socket.getInputStream();
-				fileOutPutStream = new FileOutputStream(outputFileDestination);
-				bufferedOutputStream = new BufferedOutputStream(fileOutPutStream);
-
-				while ((bytesRead = inputStream.read(byteArray, offset, bufferSize - offset)) > 0) {
-					offset += bytesRead;
-
+				// transfer protocol
+				if (message.equals("FILE")) {
+					writer.println("File name?");
+					writer.flush();
+					fileName = reader.readLine();
+					if (fileName.contains(".csv")) {
+						writer.println("File size?");
+						writer.flush();
+						bufferSize = Integer.parseInt(reader.readLine());
+						writer.println("Waiting for file...");
+						writer.flush();
+						receiveFile(outputFileDestination, fileName , bufferSize);
+					} else {
+						writer.println("400");
+						writer.flush();
+					}
+				} else {
+					writer.println("400");
+					writer.flush();
 				}
-
-				bufferedOutputStream.write(byteArray, 0, offset);
-				bufferedOutputStream.flush();
-				System.out.println("Stored");
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
+	}
+
+	/**
+	 * TODO refactor
+	 * 
+	 * @param outputFileDestination
+	 * @param fileName
+	 * @param bufferSize
+	 * @throws IOException
+	 * @throws FileNotFoundException
+	 */
+	private static void receiveFile(String outputFileDestination, String fileName, int bufferSize)
+			throws IOException, FileNotFoundException {
+		int bytesRead;
+		int offset = 0;
+		byte[] byteArray = new byte[bufferSize];
+
+		inputStream = socket.getInputStream();
+		fileOutPutStream = new FileOutputStream(outputFileDestination + fileName);
+		bufferedOutputStream = new BufferedOutputStream(fileOutPutStream);
+
+		while ((bytesRead = inputStream.read(byteArray, offset, bufferSize - offset)) > 0) {
+			offset += bytesRead;
+
+		}
+
+		bufferedOutputStream.write(byteArray, 0, offset);
+		bufferedOutputStream.flush();
+		System.out.println("Stored");
 	}
 
 }
