@@ -39,6 +39,7 @@ public class SocketServer {
 			int bufferSize = 16384;
 			String fileName = "";
 			String message = "";
+			String checkString = "";
 
 			while (true) { // always running
 				socket = serverSocket.accept();
@@ -58,7 +59,9 @@ public class SocketServer {
 					if (fileName.contains(".csv")) {
 						writer.println("File size?");
 						writer.flush();
-						bufferSize = Integer.parseInt(reader.readLine());
+						checkString = reader.readLine();
+						if(checkString.equals("Abort")) continue;
+						bufferSize = Integer.parseInt(checkString);
 						System.out.println("Waiting for file...");
 						writer.println("Waiting for file...");
 						writer.flush();
