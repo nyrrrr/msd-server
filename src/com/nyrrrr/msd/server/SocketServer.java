@@ -24,12 +24,10 @@ public class SocketServer {
 
 	private static BufferedReader reader;
 	private static PrintWriter writer;
-	private static BufferedOutputStream bufferedOutputStream;
 	private static FileOutputStream fileOutPutStream;
-	private static InputStream inputStream;
 
 	// private static String outputFileDestination = "C:\\git\\data-thesis\\";
-	private static String outputFileDestination = "C:\\Users\\nyrrrr\\Desktop\\";
+	private static String outputFileDestination = "C:\\Users\\nyrrrr\\Desktop\\data\\";
 
 	public static void main(String args[]) {
 		iPortNumber = Integer.parseInt(args[0]);
@@ -49,8 +47,11 @@ public class SocketServer {
 				writer = new PrintWriter(socket.getOutputStream(), true);
 				message = reader.readLine();
 
+				
+				
 				// transfer protocol
 				if (message.equals("FILE")) {
+					System.out.println("Mobile device connected.");
 					writer.println("File name?");
 					writer.flush();
 					fileName = reader.readLine();
@@ -58,6 +59,7 @@ public class SocketServer {
 						writer.println("File size?");
 						writer.flush();
 						bufferSize = Integer.parseInt(reader.readLine());
+						System.out.println("Waiting for file...");
 						writer.println("Waiting for file...");
 						writer.flush();
 						receiveFile(outputFileDestination, fileName, bufferSize);
@@ -90,7 +92,6 @@ public class SocketServer {
 		char[] charArray = new char[bufferSize];
 
 		fileOutPutStream = new FileOutputStream(outputFileDestination + fileName);
-		bufferedOutputStream = new BufferedOutputStream(fileOutPutStream);
 
 		while ((bytesRead = reader.read(charArray, offset, bufferSize - offset)) > 0) {
 			offset += bytesRead;
@@ -99,7 +100,7 @@ public class SocketServer {
 		PrintWriter fileWriter = new PrintWriter(fileOutPutStream);
 		fileWriter.write(charArray, 0, offset);
 		fileWriter.flush();
-		System.out.println("File successfully stored");
+		System.out.println(fileName + " successfully stored");
 		writer.println("File successfully stored");
 		writer.flush();
 	}
