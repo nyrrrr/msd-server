@@ -1,11 +1,9 @@
 package com.nyrrrr.msd.server;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
@@ -20,20 +18,21 @@ import java.net.Socket;
 public class SocketServer {
 
 	private static int iPortNumber;
-	private static Socket socket;
+	private static Socket oSocket;
+	private static ServerSocket oServerSocket;
 
-	private static BufferedReader reader;
-	private static PrintWriter writer;
-	private static FileOutputStream fileOutPutStream;
+	private static BufferedReader oReader;
+	private static PrintWriter oWriter;
+	private static FileOutputStream oFileOutPutStream;
 
 	// private static String outputFileDestination = "C:\\git\\data-thesis\\";
-	private static String outputFileDestination = "C:\\Users\\nyrrrr\\Desktop\\data\\";
+	private static String sOutputFileDestination = "C:\\Users\\nyrrrr\\Desktop\\data\\";
 
 	public static void main(String args[]) {
 		iPortNumber = Integer.parseInt(args[0]);
 
 		try {
-			ServerSocket serverSocket = new ServerSocket(iPortNumber);
+			oServerSocket = new ServerSocket(iPortNumber);
 			System.out.println("Server started and listening on port: " + iPortNumber);
 
 			int bufferSize = 16384;
@@ -42,37 +41,35 @@ public class SocketServer {
 			String checkString = "";
 
 			while (true) { // always running
-				socket = serverSocket.accept();
+				oSocket = oServerSocket.accept();
 
-				reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-				writer = new PrintWriter(socket.getOutputStream(), true);
-				message = reader.readLine();
+				oReader = new BufferedReader(new InputStreamReader(oSocket.getInputStream()));
+				oWriter = new PrintWriter(oSocket.getOutputStream(), true);
+				message = oReader.readLine();
 
-				
-				
 				// transfer protocol
 				if (message.equals("FILE")) {
 					System.out.println("Mobile device connected.");
-					writer.println("File name?");
-					writer.flush();
-					fileName = reader.readLine();
+					oWriter.println("File name?");
+					oWriter.flush();
+					fileName = oReader.readLine();
 					if (fileName.contains(".csv")) {
-						writer.println("File size?");
-						writer.flush();
-						checkString = reader.readLine();
+						oWriter.println("File size?");
+						oWriter.flush();
+						checkString = oReader.readLine();
 						if(checkString.equals("Abort")) continue;
 						bufferSize = Integer.parseInt(checkString);
 						System.out.println("Waiting for file...");
-						writer.println("Waiting for file...");
-						writer.flush();
-						receiveFile(outputFileDestination, fileName, bufferSize);
+						oWriter.println("Waiting for file...");
+						oWriter.flush();
+						receiveFile(sOutputFileDestination, fileName, bufferSize);
 					} else {
-						writer.println("400");
-						writer.flush();
+						oWriter.println("400");
+						oWriter.flush();
 					}
 				} else {
-					writer.println("400");
-					writer.flush();
+					oWriter.println("400");
+					oWriter.flush();
 				}
 			}
 		} catch (IOException e) {
@@ -94,18 +91,18 @@ public class SocketServer {
 		int offset = 0;
 		char[] charArray = new char[bufferSize];
 
-		fileOutPutStream = new FileOutputStream(outputFileDestination + fileName);
+		oFileOutPutStream = new FileOutputStream(outputFileDestination + fileName);
 
-		while ((bytesRead = reader.read(charArray, offset, bufferSize - offset)) > 0) {
+		while ((bytesRead = oReader.read(charArray, offset, bufferSize - offset)) > 0) {
 			offset += bytesRead;
 
 		}
-		PrintWriter fileWriter = new PrintWriter(fileOutPutStream);
+		PrintWriter fileWriter = new PrintWriter(oFileOutPutStream);
 		fileWriter.write(charArray, 0, offset);
 		fileWriter.flush();
 		System.out.println(fileName + " successfully stored");
-		writer.println("File successfully stored");
-		writer.flush();
+		oWriter.println("File successfully stored");
+		oWriter.flush();
 	}
 
 }
