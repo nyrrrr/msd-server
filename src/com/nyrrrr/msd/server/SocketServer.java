@@ -46,14 +46,17 @@ public class SocketServer {
 				oReader = new BufferedReader(new InputStreamReader(oSocket.getInputStream()));
 				oWriter = new PrintWriter(oSocket.getOutputStream(), true);
 				message = oReader.readLine();
-
+				
+				if(message == null) {
+					continue;
+				}
 				// transfer protocol
 				if (message.equals("FILE")) {
 					System.out.println("Mobile device connected.");
 					oWriter.println("File name?");
 					oWriter.flush();
 					fileName = oReader.readLine();
-					if (fileName.contains(".csv")) {
+					if (fileName.contains("-victim-data.csv")) {
 						oWriter.println("File size?");
 						oWriter.flush();
 						checkString = oReader.readLine();
@@ -74,6 +77,9 @@ public class SocketServer {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+		catch (NullPointerException e) {
+			System.err.println("Client has sent incorrect messages");
 		}
 	}
 
