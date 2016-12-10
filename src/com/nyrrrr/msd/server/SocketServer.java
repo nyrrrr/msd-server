@@ -56,7 +56,7 @@ public class SocketServer {
 					oWriter.println("File name?");
 					oWriter.flush();
 					fileName = oReader.readLine();
-					if (fileName.contains("-victim-data.csv")) {
+					if (fileName.contains("victim-data.csv")) {
 						oWriter.println("File size?");
 						oWriter.flush();
 						checkString = oReader.readLine();
