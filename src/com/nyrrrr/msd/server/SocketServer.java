@@ -25,8 +25,7 @@ public class SocketServer {
 	private static PrintWriter oWriter;
 	private static FileOutputStream oFileOutPutStream;
 
-	// private static String outputFileDestination = "C:\\git\\data-thesis\\";
-	private static String sOutputFileDestination = "C:\\Users\\nyrrrr\\Desktop\\data\\";
+	private static String sOutputFileDestination = "C:\\git\\data-thesis\\R\\datasets\\";
 
 	public static void main(String args[]) {
 		iPortNumber = Integer.parseInt(args[0]);
