@@ -64,7 +64,7 @@ public class SocketServer {
 						System.out.println("Waiting for file...");
 						oWriter.println("Waiting for file...");
 						oWriter.flush();
-						receiveFile(sOutputFileDestination, "transferred-" + fileName + "-RAW", bufferSize);
+						receiveFile(sOutputFileDestination, "transferred-" + fileName, bufferSize);
 					} else {
 						oWriter.println("400");
 						oWriter.flush();
